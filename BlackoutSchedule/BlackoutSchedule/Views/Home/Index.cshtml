@@ -1,0 +1,93 @@
+﻿@model IEnumerable<BlackoutSchedule.Models.ViewModels.HomeVM>
+
+
+<div class="container">
+    
+    @if (TempData.ContainsKey("Message"))
+    {
+        <div class="alert alert-info text-center">@TempData["Message"]</div>
+    }
+
+    <div class="text-center">
+        <button class="btn btn-dark filter-button" data-filter="all">All</button>
+        @foreach (var obj in Model)
+        {
+            @if (obj.Schedules.Count() > 0)
+            {
+                <button class="btn btn-outline-secondary filter-button" data-filter="@obj.GroupName.Replace(' ', '_')">
+                    @obj.GroupName
+                </button>
+            }
+            else
+            {
+                <button class="btn btn-outline-secondary filter-button disabled" style="background-color: grey; border-color: grey; color: black;" title="Для этой группы нет отключений света">
+                    @obj.GroupName
+                </button>
+            }
+        }
+    </div>
+
+    <br/>
+
+    <div class="text-center">
+        <form id="importForm" method="post" enctype="multipart/form-data" asp-action="ImportFile" asp-controller="Home">
+            <input type="file" name="file" accept=".txt" />
+            <button type="submit" class="btn btn-primary">Import TXT</button>
+        </form>
+
+        <a href="@Url.Action("ExportData", "Home")" class="btn btn-success">Export All File</a>
+    </div>
+
+    <br />
+
+    <table class="table-bordered table-striped table" style="width:100%">
+        <tread>
+            <tr>
+                <th style="width: 20%;">
+                    Group/Time
+                </th>
+                <th style="width: 50%;">
+                    Address
+                </th>
+                <th style="width: 10%;">
+                    Is light now
+                </th>
+                <th style="width: 20%;">
+
+                </th>
+            </tr>
+        </tread>
+    </table>
+
+    <div class="row">
+        @foreach (var unitVm in Model)
+        {
+            if (unitVm.Schedules.Count() > 0)
+            {
+                <partial name="_IndividualSchedulesCard" model="unitVm"/>
+                //display all actual Schedules
+            }
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            $(".filter-button").click(function () {
+
+                var value = $(this).attr('data-filter');
+                if (value == "all") {
+                    $('.filter').show('1000');
+                }
+                else {
+                    $(".filter").not('.' + value).hide();
+                    $('.filter').filter('.' + value).show();
+
+                }
+            });
+
+        });
+    </script>
+}
