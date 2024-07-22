@@ -5,7 +5,7 @@ namespace BlackoutSchedule.Repository.IRepository
 {
     public interface IScheduleRerository : IRepository<Schedules>
     {
-        void UnitUpdate(Schedules schedule);
+        void UnitUpdate(IEnumerable<Schedules> schedule, int groupId);
 
         void Update(List<Schedules> schedulesList);
     }

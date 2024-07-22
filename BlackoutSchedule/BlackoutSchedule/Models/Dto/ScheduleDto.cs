@@ -12,8 +12,6 @@ namespace BlackoutSchedule.Models.Dto
         public TimeSpan StartTime { get; set; }
         public TimeSpan FinishTime { get; set; }
 
-        public DateTime? DeleteTime { get; set; }
-
         public int GroupId { get; set; }
 
         [ForeignKey("GroupId")]

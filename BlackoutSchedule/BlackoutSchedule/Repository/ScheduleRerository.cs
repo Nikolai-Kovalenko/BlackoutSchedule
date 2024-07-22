@@ -2,6 +2,7 @@
 using BlackoutSchedule.Data;
 using BlackoutSchedule.Models;
 using BlackoutSchedule.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 using static System.Collections.Specialized.BitVector32;
 
 namespace BlackoutSchedule.Repository
@@ -15,24 +16,29 @@ namespace BlackoutSchedule.Repository
             _db = db;
         }
 
-        public void UnitUpdate(Schedules schedule)
+        public void UnitUpdate(IEnumerable<Schedules> schedule, int groupId)
         {
-            DateTime deleteTime = DateTime.Now;
-            var schedulesList = _db.Schedules.Where(u => u.GroupId == schedule.GroupId && u.DeleteTime == null).ToList();
-            if (schedulesList != null)
+            UpdateDeleteTimes(groupId);
+
+            foreach (var i in schedule)
             {
-                foreach (var i in schedulesList)
-                {
-                    i.DeleteTime = deleteTime;
-                }
+                _db.Schedules.Add(i);
             }
         }
 
-        private void UpdateDeleteTimes()
+        private void UpdateDeleteTimes(int? groupId = null)
         {
             var currentTime = DateTime.Now;
 
-            List<Schedules> schedulesList = _db.Schedules.Where(u => u.DeleteTime == null).ToList();
+            var schedulesQuery = _db.Schedules.AsQueryable();
+
+            if (groupId != null)
+            {
+                schedulesQuery = schedulesQuery.Where(u => u.GroupId == groupId);
+            }
+
+            var schedulesList = schedulesQuery
+                .Where(u => u.DeleteTime == null).ToList();
 
             foreach (var i in schedulesList)
             {
